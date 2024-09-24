@@ -1,0 +1,40 @@
+:root {
+  /* font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  color-scheme: light dark; */
+  color: rgba(255, 255, 255, 0.87);
+}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.back-color {
+  background-color: #242424;
+}
+.text-color {
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.custom-scrollbar {
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
