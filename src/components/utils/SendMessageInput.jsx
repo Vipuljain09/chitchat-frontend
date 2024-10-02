@@ -10,22 +10,63 @@ import {
   LinkIcon,
   FaceSmileIcon,
 } from "@heroicons/react/24/solid";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import data from "@emoji-mart/data";
+import Picker from "@emoji-mart/react";
 
 const SendMessageInput = ({ onSubmit, MessageText, setMessageText }) => {
-
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const emojiPickerRef = useRef(null);
+  
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       onSubmit();
     }
   };
-  
+
+  const emojiChangeHandler = (e) => {
+    setMessageText((preText) => preText + e.native);
+  };
+  console.log(showEmojiPicker);
+
   return (
     <div className="flex items-center justify-between h-full">
-      <InputGroup size="md" display="flex" alignItems="center" h={"full"}>
-        <InputLeftElement pointerEvents="none" display={"flex"} h={"full"}>
-          <FaceSmileIcon className="size-6 cursor-pointer" />
+      <InputGroup
+        size="md"
+        display="flex"
+        alignItems="center"
+        position={"relative"}
+        h={"full"}
+      >
+        <InputLeftElement display={"flex"} h={"full"}>
+          <div
+            ref={emojiPickerRef}
+            onClick={() => setShowEmojiPicker((pre) => !pre)}
+          >
+            <FaceSmileIcon className="size-6 cursor-pointer" />
+          </div>
+          {showEmojiPicker && (
+            <div className="absolute bottom-[60px] left-[0]">
+              <Picker
+                data={data}
+                onEmojiSelect={emojiChangeHandler}
+                previewPosition="none"
+                onClickOutside={(e) => {
+                  if (
+                    emojiPickerRef.current.outerHTML === e.target.outerHTML ||
+                    emojiPickerRef?.current?.children?.[0]?.innerHTML ==
+                      e.target.outerHTML
+                  ) {
+                    return;
+                  }
+                  setShowEmojiPicker(false);
+                }}
+                // className="bg-red-500"
+              />
+            </div>
+          )}
         </InputLeftElement>
+
         <Input
           placeholder="Text anything...."
           variant="unstyled"

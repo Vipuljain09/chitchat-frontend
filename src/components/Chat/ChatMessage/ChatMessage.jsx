@@ -25,6 +25,7 @@ const ChatMessage = () => {
       receiverId: currentChatOpen?._id,
       time: currrentTime,
     };
+    
     console.log(data);
     socket.emit("send_message", data);
     await updateChatHandler(data);

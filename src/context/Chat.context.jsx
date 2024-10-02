@@ -1,35 +1,38 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { SocketContext } from "./Socket.context";
-import { getUserById } from "../api/api.js";
+import { addUserToFriendList, getUserById } from "../api/api.js";
 
 const ChatContext = createContext();
 
 const ChatProvider = ({ children }) => {
-  
   const { userData, socket } = useContext(SocketContext);
 
   const [friendList, setFriendList] = useState([]);
   const [currentChatOpen, setCurrentChatOpen] = useState(null);
   const [chatHistory, setChatHistory] = useState({});
-  const [sideBarOpen, setSideBarOpen] = useState(false);
-
+  const [sideBarOpen, setSideBarOpen] = useState(true);
+  const [userSettingOpen, setUserSettingOpen] = useState(false);
   const chatHistoryRef = useRef(chatHistory);
   const friendListRef = useRef(friendList);
+
   // Step 2: Update the ref whenever chatHistory changes
+
   useEffect(() => {
     chatHistoryRef.current = chatHistory;
     friendListRef.current = friendList;
   }, [chatHistory, friendList]);
 
-  const addFriendHandler = (data) => {
-    
+  const addFriendHandler = async (data) => {
     const friendListInfo = friendListRef.current;
     const isPresent = friendListInfo?.find((item) => item?._id === data?._id);
+
     if (!isPresent) {
       setFriendList([{ ...data, unseenMessage: 0 }, ...friendListInfo]);
       setChatHistory((pre) => {
         return { ...pre, [data?._id]: [] };
       });
+      const res = await addUserToFriendList(userData?._id,data?._id);
+      console.log(res);
     }
   };
 
@@ -53,7 +56,6 @@ const ChatProvider = ({ children }) => {
 
   const updateChatHandler = async (data) => {
     try {
-
       const receiverId = data?.receiverId;
       const chatHistoryInfo = chatHistoryRef?.current;
       console.log(receiverId, chatHistory, chatHistory?.receiverId);
@@ -65,7 +67,9 @@ const ChatProvider = ({ children }) => {
 
       console.log(chatHistory, chatHistory?.[receiverId], data);
 
-      const updatedChatData = [...chatHistoryInfo?.[receiverId], data];
+      const previousChat = chatHistory?.[receiverId] || [];
+      const updatedChatData = [...previousChat, data];
+      
       setChatHistory((pre) => {
         return { ...pre, [receiverId]: updatedChatData };
       });
@@ -98,8 +102,8 @@ const ChatProvider = ({ children }) => {
       }
 
       console.log(chatHistory, chatHistory?.[senderId], data);
-
-      const updatedChatData = [...chatHistoryInfo?.[senderId], data];
+      const previousChat = chatHistoryInfo?.[senderId] || [];
+      const updatedChatData = [...previousChat, data];
       console.log(senderId, updatedChatData);
 
       setChatHistory({ ...chatHistoryInfo, [senderId]: updatedChatData });
@@ -138,14 +142,18 @@ const ChatProvider = ({ children }) => {
     <ChatContext.Provider
       value={{
         friendList,
+        setFriendList,
         currentChatOpen,
         setCurrentChatOpen,
         chatHistory,
+        setChatHistory,
         addFriendHandler,
         updateChatHandler,
         updateCurrentChatHandler,
         sideBarOpen,
         setSideBarOpen,
+        userSettingOpen,
+        setUserSettingOpen,
       }}
     >
       {children}

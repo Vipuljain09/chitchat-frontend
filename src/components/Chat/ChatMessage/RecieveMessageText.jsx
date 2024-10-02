@@ -14,22 +14,21 @@ const RecieveMessageText = ({ data, isAvatarVisible = false, senderInfo }) => {
         // bg="gray.500"
         bgGradient="linear(to-l, #5C73B9, #B330E1)"
         w="100%"
-        p={2}
+        p={1}
         color="white"
         borderRadius={"0.5rem"}
         borderTopLeftRadius={"0px"}
       >
-        <div className="flex items-center justify-between text-xs text-white font-medium">
-          <span>You</span>
-          <span>{time || "10:12 am"}</span>
-        </div>
-        <div className="py-2">
+        <div className="py-1/2 px-1">
           {data?.content ||
             `Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aspernatur
           dolor aliquid amet quibusdam debitis omnis temporibus ullam at animi
           ipsum? Architecto aperiam unde officia, odio sint, quos a quia
           quibusdam neque sit consequuntur alias optio obcaecati, cum atque?
           Quidem blanditiis earum non obcaecati.`}
+        </div>
+        <div className="flex items-center justify-end text-xs text-white">
+          <span>{time || "10:12 am"}</span>
         </div>
       </Box>
     </div>

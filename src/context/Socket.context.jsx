@@ -15,15 +15,15 @@ const SocketProvider = ({ children }) => {
 
     return () => {
       if (newSocket) {
-        newSocket.disconnect();
+        newSocket.disconnect();  
       }
     };
     
   }, []);
 
+
   const loginHandler = (user) => {
     setUserData(user); // Update user data
-
     if (socket) {
       socket.auth = { userId: user._id }; // Pass the user data to the socket
       socket.connect(); // Manually connect the socket after login

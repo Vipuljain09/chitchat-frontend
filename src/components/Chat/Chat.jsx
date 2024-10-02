@@ -5,17 +5,25 @@ import ChatHeader from "./ChatHeader/ChatHeader";
 import ChatMessage from "./ChatMessage/ChatMessage";
 import { ChatContext } from "../../context/Chat.context";
 import { SocketContext } from "../../context/Socket.context";
+import UserProfile from "../Setting/UserProfile";
+import IntialChatTemplate from "../utils/IntialChatTemplate";
 const Chat = () => {
-  const { friendList, currentChatOpen, chatHistory, sideBarOpen } =
-    useContext(ChatContext);
+  const {
+    friendList,
+    currentChatOpen,
+    chatHistory,
+    sideBarOpen,
+    userSettingOpen,
+  } = useContext(ChatContext);
 
   const { userData } = useContext(SocketContext);
-  console.log("userData-->",userData);
-  console.log("friendList",friendList);
-  console.log("currentChatOpen", currentChatOpen);
-  console.log("chatHistory",chatHistory);
-  console.log("sideBarOpen",  sideBarOpen);
 
+  console.log("userData-->", userData);
+  console.log("friendList", friendList);
+  console.log("currentChatOpen", currentChatOpen);
+  console.log("chatHistory", chatHistory);
+  console.log("sideBarOpen", sideBarOpen);
+  console.log("userSettingOpen", userSettingOpen);
   return (
     <div className="flex w-full h-screen">
       <div
@@ -23,7 +31,7 @@ const Chat = () => {
           !sideBarOpen && "hidden"
         } bg-gray-900`}
       >
-        <ChatNavbar />
+        {userSettingOpen ? <UserProfile /> : <ChatNavbar />}
       </div>
       <Divider orientation="vertical" borderColor={"black"} />
       <div
@@ -31,8 +39,14 @@ const Chat = () => {
           sideBarOpen && "hidden"
         } w-full flex `}
       >
-        <ChatHeader />
-        <ChatMessage />
+        {currentChatOpen ? (
+          <>
+            <ChatHeader />
+            <ChatMessage />
+          </>
+        ) : (
+          <IntialChatTemplate />
+        )}
       </div>
     </div>
   );

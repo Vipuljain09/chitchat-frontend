@@ -13,7 +13,7 @@ const SearchedUserItem = ({ data, onClickHandler }) => {
         onClickHandler(data);
       }}
     >
-      <UserAvatar />
+      <UserAvatar statusVisiable = {false}/>
       <div className="flex flex-col text-sm">
         <p>{data?.userName || "--"}</p>
         <p>{data?.email || "--"}</p>
@@ -89,7 +89,7 @@ const SearchUserInput = () => {
       </InputGroup>
       {searchList?.length > 0 && text?.trim() !== "" && (
         <div
-          className={`absolute top-[${inputGroupHeight}px] min-h-[400px] z-10 my-2 w-full flex flex-col bg-gray-800 rounded-lg`}
+          className={`absolute top-[${inputGroupHeight}px] left-0 min-h-[400px] z-10 my-2 w-full flex flex-col bg-gray-800 rounded-lg`}
         >
           {searchList?.map((item) => (
             <SearchedUserItem

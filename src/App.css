@@ -7,3 +7,9 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+
+[data-theme="dark"] {
+  /* --em-rgb-background: 96, 96, 96; Custom dark background color in RGB */
+  --em-rgb-background: var(--rgb-background, 96, 96, 96) !important;
+}

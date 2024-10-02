@@ -1,9 +1,20 @@
-import { Input } from "@chakra-ui/react";
-import React, { useState } from "react";
+import {
+  FormControl,
+  FormErrorMessage,
+  Input,
+  InputGroup,
+  InputRightElement,
+} from "@chakra-ui/react";
+import React, { useContext, useState } from "react";
 import { json, useNavigate } from "react-router-dom";
+import { SocketContext } from "../../context/Socket.context";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { loginHandler } = useContext(SocketContext);
+  const [showPassword, setShowPassword] = useState(false);
+
   const [userDetail, setUserDetail] = useState({
     userName: "",
     password: "",
@@ -11,6 +22,11 @@ const SignUp = () => {
   });
 
   const [errMessage, setErrMessage] = useState(null);
+
+  const toggleShowPassword = () => {
+    setShowPassword((pre) => !pre);
+  };
+
   const checkValidation = () => {
     setErrMessage(null);
     const err = {};
@@ -27,7 +43,7 @@ const SignUp = () => {
       userDetail?.email?.trim() === "" ||
       !emailRegex?.test(userDetail?.email?.trim())
     ) {
-      err.email = "Email is not valid";
+      err.email = "email is not valid";
       flg = false;
     }
     if (
@@ -35,13 +51,14 @@ const SignUp = () => {
       !passwordRegex.test(userDetail?.password?.trim())
     ) {
       err.password =
-        "Password should contain lower-case, upper-case, digit and specail character and have atleast 8 character long.";
+        "password should contain lower-case, upper-case, digit and specail character and have atleast 8 character long.";
       flg = false;
     }
 
     setErrMessage(err);
     return flg;
   };
+
   const submitHandler = async () => {
     if (!checkValidation()) return;
 
@@ -59,14 +76,24 @@ const SignUp = () => {
         },
         body: JSON.stringify(data),
       });
+
       const result = await response.json();
-      if (result?.statusCode >= 400) return;
+      if (result?.statusCode >= 400) {
+        setErrMessage({ finalMessage: result?.message });
+        return;
+      }
 
       console.log(result);
+
       const accessToken = result?.data?.accessToken;
       const userInfo = result?.data;
       sessionStorage.setItem("accessToken", accessToken);
       sessionStorage.setItem("user", JSON.stringify(userInfo));
+
+      loginHandler(userInfo);
+
+      // add loginHandler here to open the socket connection and update the user the data.
+
       navigate("/chat");
     } catch (error) {
       console.log(error);
@@ -78,45 +105,79 @@ const SignUp = () => {
   return (
     <div className="flex w-full h-screen bg-gray-950 text-color">
       <div className="flex flex-col w-[90%] sm:w-[60%] md:w-[50%] lg:w-[30%] mx-auto h-[450px] mt-24">
+        <p className="text-center text-red-400 text-sm font-medium">
+          {errMessage?.finalMessage && errMessage?.finalMessage}
+        </p>
         <p className="text-xl lg:text-2xl font-medium my-8">Sign Up</p>
         <div className="flex flex-col gap-8">
-          <Input
-            placeholder="Username"
-            variant="unstyled"
-            bg="gray.800"
-            p={"0.75rem"}
-            color={"gray.500"}
-            borderRadius={"2rem"}
-            value={userDetail["userName"]}
-            onChange={(e) =>
-              setUserDetail({ ...userDetail, userName: e.target.value })
-            }
-          />
-          <Input
-            placeholder="Email"
-            variant="unstyled"
-            bg="gray.800"
-            p={"0.75rem"}
-            color={"gray.500"}
-            borderRadius={"2rem"}
-            value={userDetail["email"]}
-            onChange={(e) =>
-              setUserDetail({ ...userDetail, email: e.target.value })
-            }
-          />
-          <Input
-            placeholder="Passsword"
-            type="password"
-            variant="unstyled"
-            bg="gray.800"
-            p={"0.75rem"}
-            color={"gray.500"}
-            borderRadius={"2rem"}
-            value={userDetail["password"]}
-            onChange={(e) =>
-              setUserDetail({ ...userDetail, password: e.target.value })
-            }
-          />
+          <FormControl isInvalid={errMessage?.userName}>
+            <Input
+              placeholder="Username"
+              variant="unstyled"
+              bg="gray.800"
+              p={"0.75rem"}
+              color={"gray.500"}
+              borderRadius={"2rem"}
+              value={userDetail["userName"]}
+              onChange={(e) =>
+                setUserDetail({ ...userDetail, userName: e.target.value })
+              }
+            />
+            {errMessage?.userName && (
+              <FormErrorMessage px={2}>{errMessage?.userName}</FormErrorMessage>
+            )}
+          </FormControl>
+          <FormControl isInvalid={errMessage?.email}>
+            <Input
+              placeholder="Email"
+              variant="unstyled"
+              bg="gray.800"
+              p={"0.75rem"}
+              color={"gray.500"}
+              borderRadius={"2rem"}
+              value={userDetail["email"]}
+              onChange={(e) =>
+                setUserDetail({ ...userDetail, email: e.target.value })
+              }
+            />
+            {errMessage?.email && (
+              <FormErrorMessage px={2}>{errMessage?.email}</FormErrorMessage>
+            )}
+          </FormControl>
+          <FormControl isInvalid={errMessage?.password}>
+            <InputGroup display={"flex"}>
+              <Input
+                placeholder="Passsword"
+                type={showPassword ? "text" : "password"}
+                variant="unstyled"
+                bg="gray.800"
+                p={"0.75rem"}
+                pr={"1.5rem"}
+                color={"gray.500"}
+                borderRadius={"2rem"}
+                value={userDetail["password"]}
+                onChange={(e) =>
+                  setUserDetail({ ...userDetail, password: e.target.value })
+                }
+              />
+              <InputRightElement m={1} display={"flex"}>
+                {showPassword ? (
+                  <EyeSlashIcon
+                    className="cursor-pointer size-6"
+                    onClick={toggleShowPassword}
+                  />
+                ) : (
+                  <EyeIcon
+                    className="cursor-pointer size-6"
+                    onClick={toggleShowPassword}
+                  />
+                )}
+              </InputRightElement>
+            </InputGroup>
+            {errMessage?.password && (
+              <FormErrorMessage px={2}>{errMessage?.password}</FormErrorMessage>
+            )}
+          </FormControl>
         </div>
         <p
           className="text-lg font-semibold py-3 my-8 text-center bg-gradient-to-r from-purple-500 to-pink-500 rounded-full cursor-pointer"
